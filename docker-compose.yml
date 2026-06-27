@@ -1,65 +1,31 @@
-version: "3.9"
 
 services:
-  db:
-    image: supabase/postgres:17.6.1.136
-    container_name: supabase-db
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
     restart: unless-stopped
-
-    env_file:
-      - .env
-
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
-
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./volumes/db:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - cloudbeaver_net
 
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  studio:
-    image: supabase/studio:2026.06.03-sha-0bca601
-    container_name: supabase-studio
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: cloudbeaver
     restart: unless-stopped
-
-    env_file:
-      - .env
-
-    depends_on:
-      db:
-        condition: service_healthy
-
-    environment:
-      STUDIO_PG_META_URL: http://meta:8080
-      DEFAULT_ORGANIZATION_NAME: Leonet
-      DEFAULT_PROJECT_NAME: Production
-
     ports:
-      - "3000:3000"
-
-  meta:
-    image: supabase/postgres-meta:v0.96.6
-    container_name: supabase-meta
-    restart: unless-stopped
-
-    env_file:
-      - .env
-
+      - "127.0.0.1:8978:8978"
+    volumes:
+      - ./cloudbeaver-data:/opt/cloudbeaver/workspace
+    networks:
+      - cloudbeaver_net
     depends_on:
-      db:
-        condition: service_healthy
+      - postgres
 
-    environment:
-      PG_META_PORT: 8080
-
-      PG_META_DB_HOST: db
-      PG_META_DB_NAME: ${POSTGRES_DB}
-      PG_META_DB_PORT: 5432
-      PG_META_DB_USER: ${POSTGRES_USER}
-      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+networks:
+  cloudbeaver_net:
+    driver: bridge
