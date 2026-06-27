@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   db:
-    image: supabase/postgres:15.8.1.060
+    image: supabase/postgres:17.6.1.136
     container_name: supabase-db
     restart: unless-stopped
 
@@ -24,7 +24,7 @@ services:
       retries: 5
 
   studio:
-    image: supabase/studio:latest
+    image: supabase/studio:2026.06.03-sha-0bca601
     container_name: supabase-studio
     restart: unless-stopped
 
@@ -44,7 +44,7 @@ services:
       - "3000:3000"
 
   meta:
-    image: supabase/postgres-meta:latest
+    image: supabase/postgres-meta:v0.96.6
     container_name: supabase-meta
     restart: unless-stopped
 
