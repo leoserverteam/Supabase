@@ -15,9 +15,6 @@ jobs:
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > ${{vars.DEPLOY_PATH}}/${{ github.event.repository.name }}/.env 
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> ${{vars.DEPLOY_PATH}}/${{ github.event.repository.name }}/.env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> ${{vars.DEPLOY_PATH}}/${{ github.event.repository.name }}/.env 
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ${{vars.DEPLOY_PATH}}/${{ github.event.repository.name }}/.env 
-          echo "ANON_KEY=${{ secrets.ANON_KEY }}" >> ${{vars.DEPLOY_PATH}}/${{ github.event.repository.name }}/.env 
-          echo "SERVICE_ROLE_KEY=${{ secrets.SERVICE_ROLE_KEY }}" >> ${{vars.DEPLOY_PATH}}/${{ github.event.repository.name }}/.env 
 
   call-deploy:
     needs: [prepare-env]
