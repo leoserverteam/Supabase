@@ -25,6 +25,14 @@ services:
       - cloudbeaver_net
     depends_on:
       - postgres
+    environment:
+      - CLOUDBEAVER_AUTH_OPENID_DISABLE=false
+      - CLOUDBEAVER_AUTH_OPENID_CLIENT_ID=${OPENID_CLIENT_ID}
+      - CLOUDBEAVER_AUTH_OPENID_CLIENT_SECRET=${OPENID_CLIENT_SECRET}
+      - CLOUDBEAVER_AUTH_OPENID_AUTH_URL=https://leonet.site/application/o/authorize/
+      - CLOUDBEAVER_AUTH_OPENID_TOKEN_URL=https://leonet.site/application/o/token/
+      - CLOUDBEAVER_AUTH_OPENID_USER_INFO_URL=https://leonet.site/application/o/userinfo/
+      - CLOUDBEAVER_AUTH_OPENID_DISPLAY_NAME=Вход через SSO
 
 networks:
   cloudbeaver_net:
