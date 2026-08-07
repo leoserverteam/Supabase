@@ -13,29 +13,43 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
-      - cloudbeaver_net
+      - dbgate_net
 
-  cloudbeaver:
-    image: dbeaver/cloudbeaver:latest
-    container_name: cloudbeaver
+  dbgate:
+    image: dbgate/dbgate:latest
+    container_name: dbgate
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8978:8978"
+      - "127.0.0.1:8978:3000"
     volumes:
-      - ./cloudbeaver-data:/opt/cloudbeaver/workspace
+      - ./dbgate-data:/root/.dbgate
     networks:
-      - cloudbeaver_net
+      - dbgate_net
     depends_on:
       - postgres
     environment:
-      - CLOUDBEAVER_AUTH_OPENID_DISABLE=false
-      - CLOUDBEAVER_AUTH_OPENID_CLIENT_ID=${OPENID_CLIENT_ID}
-      - CLOUDBEAVER_AUTH_OPENID_CLIENT_SECRET=${OPENID_CLIENT_SECRET}
-      - CLOUDBEAVER_AUTH_OPENID_AUTH_URL=https://leonet.site/application/o/authorize/
-      - CLOUDBEAVER_AUTH_OPENID_TOKEN_URL=https://leonet.site/application/o/token/
-      - CLOUDBEAVER_AUTH_OPENID_USER_INFO_URL=https://leonet.site/application/o/userinfo/
-      - CLOUDBEAVER_AUTH_OPENID_DISPLAY_NAME=Вход через SSO
+      # --- Предустановленное подключение к postgres из этого compose ---
+      - CONNECTIONS=postgres
+      - LABEL_postgres=Postgres
+      - SERVER_postgres=postgres
+      - PORT_postgres=5432
+      - USER_postgres=${POSTGRES_USER}
+      - PASSWORD_postgres=${POSTGRES_PASSWORD}
+      - DATABASE_postgres=${POSTGRES_DB}
+      - ENGINE_postgres=postgres@dbgate-plugin-postgres
+
+      # --- SSO через Authentik (OAuth2/OIDC) ---
+      - AUTH_PROVIDER=oauth
+      - OAUTH_AUTH=https://leonet.site/application/o/authorize/
+      - OAUTH_TOKEN=https://leonet.site/application/o/token/
+      - OAUTH_LOGOUT=https://leonet.site/application/o/db-gate/end-session/
+      - OAUTH_CLIENT_ID=${OPENID_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OPENID_CLIENT_SECRET}
+      - OAUTH_SCOPE=openid email profile
+      # preferred_username = user.username в Authentik, оно обязательное,
+      # в отличие от email (там могут быть пустые почты у части юзеров)
+      - OAUTH_LOGIN_FIELD=preferred_username
 
 networks:
-  cloudbeaver_net:
+  dbgate_net:
     driver: bridge
