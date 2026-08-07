@@ -28,15 +28,35 @@ services:
     depends_on:
       - postgres
     environment:
-      # --- Предустановленное подключение к postgres из этого compose ---
-      - CONNECTIONS=postgres
-      - LABEL_postgres=Postgres
+      # --- Предустановленные подключения к postgres из этого compose ---
+      # (один сервер, несколько существующих баз на нём: main_database,
+      # katelearn, travels - учти, что тут только эти 3, если появятся
+      # новые базы на сервере - допиши по аналогии)
+      - CONNECTIONS=postgres,katelearn,travels
+
+      - LABEL_postgres=Postgres (main_database)
       - SERVER_postgres=postgres
       - PORT_postgres=5432
       - USER_postgres=${POSTGRES_USER}
       - PASSWORD_postgres=${POSTGRES_PASSWORD}
       - DATABASE_postgres=${POSTGRES_DB}
       - ENGINE_postgres=postgres@dbgate-plugin-postgres
+
+      - LABEL_katelearn=Katelearn
+      - SERVER_katelearn=postgres
+      - PORT_katelearn=5432
+      - USER_katelearn=${POSTGRES_USER}
+      - PASSWORD_katelearn=${POSTGRES_PASSWORD}
+      - DATABASE_katelearn=katelearn
+      - ENGINE_katelearn=postgres@dbgate-plugin-postgres
+
+      - LABEL_travels=Travels
+      - SERVER_travels=postgres
+      - PORT_travels=5432
+      - USER_travels=${POSTGRES_USER}
+      - PASSWORD_travels=${POSTGRES_PASSWORD}
+      - DATABASE_travels=travels
+      - ENGINE_travels=postgres@dbgate-plugin-postgres
 
       # --- SSO через Authentik (OAuth2/OIDC) ---
       - AUTH_PROVIDER=oauth
